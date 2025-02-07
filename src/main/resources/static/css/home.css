@@ -1,0 +1,18 @@
+body {
+    background-color: white;
+    color: black;
+    font-family: sans-serif;
+    margin: 2.5em;
+  }
+  
+  h1 {
+    border-bottom: 0.12em solid black;
+    font-size: 170%;
+    font-weight: bold;
+    margin-bottom: 1.5em;
+    padding-bottom: 0.2em;
+  }
+  
+  div {
+    padding-top: 0.5em;
+  }

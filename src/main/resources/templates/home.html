@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" th:href="@{/css/reset.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/home.css}" type="text/css">
+    <title>Spring Boot &ndash; Server Side Events Demo</title>
+</head>
+<body>
+
+    <h1>Spring Boot: Server Side Events Demo</h1>
+    <button>Call SSE</button>
+    <div id="response"></div>
+    <script th:src="@{/js/home.js}"></script>
+</body>
+</html>
