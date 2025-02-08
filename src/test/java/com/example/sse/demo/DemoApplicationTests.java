@@ -1,5 +1,6 @@
 package com.example.sse.demo;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 //import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
@@ -28,18 +32,31 @@ class DemoApplicationTests {
 
 	@Test
 	void sseTest() throws Exception {
+		String rPid = UUID.randomUUID().toString();
+		// Emulate browser quit
+		MvcResult asyncResult = 
+			mockMvc.perform(get("/news?pid="+rPid))
+					.andExpect(request().asyncStarted())
+					.andReturn();
+		asyncResult = 
+			mockMvc.perform(get("/news?pid="+rPid))
+				.andExpect(request().asyncStarted())
+				.andReturn();		
 		MvcResult mvcResult = 
-			mockMvc.perform(asyncDispatch(
-				mockMvc.perform(get("/news"))
-						.andExpect(request().asyncStarted())
-						.andReturn()))
+			mockMvc.perform(asyncDispatch(asyncResult))
 				//.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(header().string("Content-Type", "text/event-stream"))
 				.andReturn();
 
 		String response = mvcResult.getResponse().getContentAsString();
-		assertTrue(response.contains("{\"texto\":\"Mensaje de texto\",\"number\":55}"));
+		// Response: data:{...}
+		JSONObject json = new JSONObject(response.substring(5));
+		String texto = json.getString("texto");
+		int number = json.getInt("number");
+		assertTrue(rPid.equals(texto));
+		assertTrue(number>0);
+		assertTrue(number<100);
 	}
 
 

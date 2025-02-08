@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -15,15 +17,18 @@ public class NewsController {
     
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
+    @Autowired
+    private SampleDataService sampleDataService;
+
     @GetMapping("/news")
-    public SseEmitter streamSseEvents() {
+    public SseEmitter streamSseEvents(@RequestParam(name = "pid") String processId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         executor.execute(() -> {
             try {
-                Thread.sleep(10000); // simulate delay
-                emitter.send(new SampleData("Mensaje de texto", 55));
+                emitter.send(sampleDataService.generateData(processId));
                 emitter.complete();
-            } catch (IOException | InterruptedException e) {
+                sampleDataService.clearCache(processId);
+            } catch (IOException e) {
                 emitter.completeWithError(e);
             }
         });
